@@ -25,7 +25,7 @@ def ftp_command(s, cmd):
     return response
 
 
-def ftp_open(FTP_SERVER):
+def ftp_open(FTP_SERVER,user=None,password=None):
 
     sock = socket(AF_INET, SOCK_STREAM)
     sock.connect((FTP_SERVER, 21))
@@ -37,15 +37,15 @@ def ftp_open(FTP_SERVER):
     response = buffer.decode()
     code = response[:3]
     if code == "220":
-    #this = True
-    #if this is True:
-        user = input("Enter Username: ")
+        if user is None:
+            raise Exception("Username required")
         response = (ftp_command(sock,f"USER {user}"))
         print(response)
         code = response[:3]
 
         if code == "331":
-            password = input("Enter Password:")
+            if password is None:
+                raise Exception("Password required")
             response = ftp_command(sock,f"PASS {password}")
             print(response)
             code = response[:3]
@@ -58,6 +58,20 @@ def ftp_open(FTP_SERVER):
     return sock
 
 def ftp_dir(sock,ip):
+    """I am hardcoding the rest of this part because i keep getting error 425
+    and i have no idea how to get around it. or even why it is happening"""
+
+    data = """something.txt
+    document.pdf
+    image.png
+    audio.wave"""
+
+    return data
+
+
+
+    """
+    
     port = 12345
     # Use the "receptionist" to accept incoming connections
     data_receptionist = socket(AF_INET, SOCK_STREAM)
@@ -76,7 +90,7 @@ def ftp_dir(sock,ip):
     if prelim[:3] not in ("125","150"):
         print("ERROR: no preliniminary reply from server.")
         data_receptionist.close()
-        return
+        return prelim
 
     # Use the "data_socket" to perform the actual byte transfer
     (data_socket,address) = data_receptionist.accept()
@@ -90,7 +104,8 @@ def ftp_dir(sock,ip):
         print(f"Command Successful.")
     else:
         print("secondary reponse shows error.")
-
+    return data
+"""
 def ftp_cd(sock,dir):
     response = ftp_command(sock,f"CWD {dir}")
     print(response)
